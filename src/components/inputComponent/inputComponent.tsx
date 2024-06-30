@@ -4,6 +4,7 @@ import { Chat } from "../../functions/ollamaFunction";
 
 function InputComponent(props: any) {
   const [inputValue, setInputValue] = useState("");
+  const [isResponding, setIsResponding] = useState(false)
   const { llamaVersion,language, history, setHistory } = props;
 
   const handleInputChange = (event: any) => {
@@ -11,22 +12,34 @@ function InputComponent(props: any) {
   };
 
   const handleKeyDown = (event: any) => {
-    if (event.key === "Enter") {
+    if (event.key === "Enter" && !isResponding) {
       sendMsg();
     }
   };
 
-  const handleMessageChunk = (chunk:any) => {
-    const newHistory = [...history, { role: "assistant", content: chunk }];
-    setHistory(newHistory)
+  const handleMessageChunk = (chunk: any) => {
+    setHistory((prevHistory: any) => {
+      const newHistory = [...prevHistory];
+      const lastMessage = newHistory.pop();
+      if (lastMessage && lastMessage.role === 'assistant') {
+        lastMessage.content = chunk;
+        newHistory.push(lastMessage);
+      } else {
+        if (lastMessage) newHistory.push(lastMessage);
+        newHistory.push({ role: "assistant", content: chunk });
+      }
+      return newHistory;
+    });
   };
 
   const sendMsg = async () => {
+    setIsResponding(true)
     const newHistory = [...history, { role: "user", content: inputValue }];
     setHistory(newHistory);
-    setInputValue("");
-    const answer = await Chat(llamaVersion, newHistory, language, handleMessageChunk);
-    setHistory([...newHistory, answer]);
+    setInputValue(""); 
+    const fullAnswer = await Chat(llamaVersion, newHistory, language, handleMessageChunk);
+    setHistory((prevHistory: any) => [...prevHistory.slice(0, -1), { role: "assistant", content: fullAnswer }]);
+    setIsResponding(false)
   };
 
   return (
@@ -38,8 +51,9 @@ function InputComponent(props: any) {
         onChange={handleInputChange}
         onKeyDown={handleKeyDown}
         placeholder="Ask me something"
+        
       />
-      <button onClick={() => sendMsg()}>Send</button>
+      <button onClick={() => sendMsg()} disabled={isResponding}>Send</button>
     </div>
   );
 }

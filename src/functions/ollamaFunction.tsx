@@ -25,31 +25,23 @@
 import ollama from 'ollama';
 
 export async function Chat(llamaVersion:string, history:any, language:string, onMessageChunk:any) {
-  const system = {
-    role: 'system',
-    content: `your role is to be my friend, ${
-      language ? `Answer only in ${language} language` : ''
-    }`,
-  };
-
+  const system = {role: 'system',content: `your role is to be my friend, ${language ? `Answer only in ${language} language` : ''}`};
   const messages = [system, ...history];
   let fullResponse = '';
 
   try {
-    const response = await ollama.chat({
-      model: llamaVersion,
-      messages: messages,
-      stream: true,
-    });
+    const response = await ollama.chat({model: llamaVersion, messages: messages,stream: true,});
 
     for await (const part of response) {
       const chunk = part.message.content;
       fullResponse += chunk;
-      onMessageChunk(fullResponse); // Send the chunk back to the component
+      onMessageChunk(fullResponse); 
     }
+    
+   
   } catch (error) {
     console.error('Error in chat:', error);
   }
 
-  return ;
+return fullResponse
 }
