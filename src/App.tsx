@@ -1,37 +1,25 @@
 import './App.scss'
-import InputComponent from './components/inputComponent/inputComponent'
-import ChatHistoryComponent from './components/chatHistoryComponent/chatHistoryComponent'
 import PopupComponent from './components/popupComponent/popupComponent'
 import { useState } from 'react';
+import ChatComponent from './components/chatComponent/chatComponent';
+
+export type TVersion = 'llama2' | 'llama3';
+export type TLanguage = 'Bulgarian' | 'Spanish' | 'English';
+
+export interface IConfig {
+  version: TVersion;
+  language: TLanguage;
+}
 
 function App() {
-  const [version, setVersion] = useState<string>('');
-  const [language, setLanguage] = useState<string>('');
-  const [showPopup, setShowPopup] = useState<boolean>(true);
-  const [history, setHistory] = useState<Array<{ role: string, content: string }>>([]);
-
-  const handleSelectVersion = (selectedVersion: string, selectedLanguage?: string) => {
-    setVersion(selectedVersion);
-    if (selectedLanguage) {
-      setLanguage(selectedLanguage);
-    }
-    setShowPopup(false);
-  };
+  const [config, setConfig] = useState<IConfig | null>(null);
 
   return (
     <div className="app">
-      {showPopup ? 
-        <PopupComponent onSelectVersion={handleSelectVersion} />
-       : 
-        <>
-          <ChatHistoryComponent history={history} />
-          <InputComponent
-            llamaVersion={version}
-            language={language}
-            history={history}
-            setHistory={setHistory}
-          />
-        </>
+      {
+        !config 
+          ? <PopupComponent setConfig={setConfig} />
+          : <ChatComponent config={config} />
       }
     </div>
   );

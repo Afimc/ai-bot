@@ -1,44 +1,24 @@
-// import ollama from 'ollama'
-
-
-
-
-// export async function Chat(llamaVersion:string, hystory:any[], language:any, handleMessageChunk:any) {
-// const system = {role:'system', content:`your role is to be my friend,  ${language? `Answer only on ${language} language`:''} `}
-// let fullresponce=''
-//         const messages = [system, ...hystory]
-//         const responce = await ollama.chat({
-//             model: llamaVersion,
-//             messages: messages, 
-//             stream:true,   
-//         })
-//         for await (const part of responce) {
-//             process.stdout.write(part.message.content)
-//           }
-    
- 
-//     return fullresponce
-// }
-
-
-
 import ollama from 'ollama';
+import { IMessage } from '../components/chatComponent/chatComponent';
+import { IConfig } from '../App';
+import { Dispatch, SetStateAction } from 'react';
 
-export async function Chat(llamaVersion:string, history:any, language:string, onMessageChunk:any) {
-  const system = {role: 'system',content: `your role is to be my friend, ${language ? `Answer only in ${language} language` : ''}`};
-  const messages = [system, ...history];
-  let fullResponse = '';
+export async function Chat(history:IMessage[], config:IConfig, setChunkMessage:Dispatch<SetStateAction<string>>) {
+  const messageOne:IMessage = {role:'system', content: 'your role is to be my friend'};
+  const messageTwo:IMessage = {role: 'system', content: `answer always on ${config.language}`};
+  const systemMessages = [messageOne, messageTwo];
+  const messages = [...systemMessages, ...history]
+  let fullResponse = ''
 
   try {
-    const response = await ollama.chat({model: llamaVersion, messages: messages,stream: true,});
+    const response = await ollama.chat({model: config.version, messages: messages,stream: true});
 
     for await (const part of response) {
       const chunk = part.message.content;
       fullResponse += chunk;
-      onMessageChunk(fullResponse); 
+      setChunkMessage(fullResponse)
     }
-    
-   
+
   } catch (error) {
     console.error('Error in chat:', error);
   }
