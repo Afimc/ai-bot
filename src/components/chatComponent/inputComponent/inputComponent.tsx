@@ -2,7 +2,7 @@ import { useState } from "react";
 import "./inputComponent.scss";
 
 interface IInputProps {
-  onSend: (message:string) => void;
+  onSend: (message: string) => void;
   isReady: boolean;
 }
 
@@ -16,7 +16,7 @@ function InputComponent(props: IInputProps) {
   const onSend = (event: any) => {
     if (event.key === "Enter" && props.isReady) {
       props.onSend(inputValue);
-      setInputValue('')
+      setInputValue("");
     }
   };
 
@@ -29,9 +29,9 @@ function InputComponent(props: IInputProps) {
         onChange={handleInputChange}
         onKeyDown={onSend}
         placeholder="Ask me something"
-        
       />
-      <button onClick={()=>{props.onSend(inputValue); setInputValue('')}} disabled={!props.isReady}>Send</button>
+      <button
+        onClick={() => {props.onSend(inputValue); setInputValue("")}} disabled={!props.isReady}>Send</button>
     </div>
   );
 }

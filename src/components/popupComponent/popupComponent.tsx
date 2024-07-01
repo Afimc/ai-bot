@@ -2,9 +2,7 @@ import { IConfig, TLanguage, TVersion } from "../../App";
 import "./popupComponent.scss";
 import { Dispatch, SetStateAction, useState } from "react";
 
-interface IConfigProps {
-  setConfig: Dispatch<SetStateAction<IConfig | null>>;
-}
+interface IConfigProps {setConfig: Dispatch<SetStateAction<IConfig | null>>}
 
 function PopupComponent(props: IConfigProps) {
   const [selectedVersion, setSelectedVersion] = useState<TVersion | "">("");
@@ -26,10 +24,7 @@ function PopupComponent(props: IConfigProps) {
   return (
     <div className="popup">
       <div className="selectVersion">
-        <select
-          defaultValue={""}
-          onChange={(event) => onVersionChange(event.target.value as TVersion)}
-        >
+        <select defaultValue={""} onChange={(event) => onVersionChange(event.target.value as TVersion)}>
           <option disabled value={""}>Select Version</option>
           <option value={"llama2"}>Llama2</option>
           <option value={"llama3"}>Llama3</option>
